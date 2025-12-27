@@ -60,64 +60,52 @@ describe('Integration Tests - Text Analysis API', () => {
   });
 
   // ==========================================
-  // External API Integration Tests with Mocking
+  // Sentiment Analysis Tests (Local Algorithm)
   // ==========================================
 
-  describe('POST /analyze/sentiment - External API Integration', () => {
+  describe('POST /analyze/sentiment - Local Analysis', () => {
     
-    it('should use external API when available', async () => {
-      // Mock the external sentiment API
-      nock('https://api.api-ninjas.com')
-        .get('/v1/sentiment')
-        .query(true) // Match any query params
-        .reply(200, {
-          sentiment: 'POSITIVE',
-          score: 0.85
-        });
-
+    it('should detect positive sentiment', async () => {
       const response = await request(app)
         .post('/analyze/sentiment')
-        .send({ text: 'This is amazing!' })
+        .send({ text: 'This is amazing and wonderful!' })
         .expect(200);
 
       expect(response.body.sentiment).toBe('positive');
-      expect(response.body.source).toBe('api');
-    });
-
-    it('should fallback to local analysis when API fails', async () => {
-      // Mock API to return error
-      nock('https://api.api-ninjas.com')
-        .get('/v1/sentiment')
-        .query(true)
-        .replyWithError('Service unavailable');
-
-      const response = await request(app)
-        .post('/analyze/sentiment')
-        .send({ text: 'This is great and wonderful!' })
-        .expect(200);
-
-      // Should still return a result using local fallback
-      expect(response.body.sentiment).toBeDefined();
+      expect(response.body.score).toBeGreaterThan(0);
       expect(response.body.source).toBe('local');
     });
 
-    it('should fallback when API times out', async () => {
-      // Mock API timeout
-      nock('https://api.api-ninjas.com')
-        .get('/v1/sentiment')
-        .query(true)
-        .delay(10000) // Delay longer than timeout
-        .reply(200, { sentiment: 'POSITIVE' });
-
+    it('should detect negative sentiment', async () => {
       const response = await request(app)
         .post('/analyze/sentiment')
         .send({ text: 'This is terrible and awful!' })
         .expect(200);
 
-      // Should use local fallback due to timeout
       expect(response.body.sentiment).toBe('negative');
-      expect(response.body.source).toBe('local');
-    }, 15000); // Increase test timeout
+      expect(response.body.score).toBeLessThan(0);
+    });
+
+    it('should detect neutral sentiment', async () => {
+      const response = await request(app)
+        .post('/analyze/sentiment')
+        .send({ text: 'The sky is blue.' })
+        .expect(200);
+
+      expect(response.body.sentiment).toBe('neutral');
+      expect(response.body.score).toBe(0);
+    });
+
+    it('should return matched words for transparency', async () => {
+      const response = await request(app)
+        .post('/analyze/sentiment')
+        .send({ text: 'This product is great and amazing!' })
+        .expect(200);
+
+      expect(response.body.matchedWords).toBeDefined();
+      expect(response.body.matchedWords.positive).toContain('great');
+      expect(response.body.matchedWords.positive).toContain('amazing');
+    });
 
     it('should return 400 when text is missing', async () => {
       const response = await request(app)

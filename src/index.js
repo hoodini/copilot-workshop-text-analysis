@@ -164,55 +164,78 @@ function containsProfanity(text) {
 
 // Configuration for external APIs (can be overridden in tests)
 const API_CONFIG = {
-  sentimentApi: process.env.SENTIMENT_API_URL || 'https://api.api-ninjas.com/v1/sentiment',
-  sentimentApiKey: process.env.SENTIMENT_API_KEY || 'demo-key',
+  // Using free translation API (no key required)
   translateApi: process.env.TRANSLATE_API_URL || 'https://api.mymemory.translated.net/get',
   timeout: parseInt(process.env.API_TIMEOUT) || 5000
 };
 
 /**
- * Analyze sentiment using external API
- * Uses API-Ninjas sentiment API (free tier available)
- * Falls back to local analysis if API fails
+ * Analyze sentiment of text
+ * Uses a simple but effective word-based analysis
+ * 
+ * In a real production app, you'd integrate with:
+ * - OpenAI API (paid)
+ * - Google Cloud Natural Language (paid) 
+ * - AWS Comprehend (paid)
+ * - Hugging Face Inference API (has free tier)
+ * 
+ * For this workshop, we use local analysis to avoid API key requirements
  * 
  * @param {string} text - Text to analyze
  * @returns {Promise<{score: number, sentiment: string}>}
  */
 async function analyzeSentiment(text) {
-  try {
-    // Call real sentiment API (API-Ninjas - free tier: 10k requests/month)
-    const response = await axios.get(API_CONFIG.sentimentApi, {
-      params: { text: text.substring(0, 2000) }, // API has text limit
-      headers: { 'X-Api-Key': API_CONFIG.sentimentApiKey },
-      timeout: API_CONFIG.timeout
-    });
-    
-    // API returns: { sentiment: "POSITIVE" | "NEGATIVE" | "NEUTRAL", score: 0.85 }
-    return {
-      score: response.data.score || 0,
-      sentiment: (response.data.sentiment || 'neutral').toLowerCase(),
-      source: 'api'
-    };
-  } catch (error) {
-    // Fallback to local analysis when API unavailable
-    return analyzeLocalSentiment(text);
-  }
+  // Simulate async behavior (like a real API call would have)
+  return new Promise((resolve) => {
+    // Small delay to simulate network latency
+    setTimeout(() => {
+      resolve(analyzeLocalSentiment(text));
+    }, 50);
+  });
 }
 
 /**
- * Local fallback sentiment analysis
- * Used when external API is unavailable
+ * Local sentiment analysis using word matching
+ * 
+ * This is intentionally simple for the workshop.
+ * Workshop exercise: Ask Copilot to improve this algorithm!
+ * 
+ * Improvements participants could make:
+ * - Add more words
+ * - Handle negation ("not good" → negative)
+ * - Use word stemming
+ * - Add intensity modifiers ("very good" → more positive)
  */
 function analyzeLocalSentiment(text) {
-  const positiveWords = ['good', 'great', 'excellent', 'amazing', 'wonderful', 'fantastic', 'love', 'happy', 'best', 'awesome'];
-  const negativeWords = ['bad', 'terrible', 'awful', 'horrible', 'hate', 'sad', 'angry', 'disappointed', 'worst', 'poor'];
+  const positiveWords = [
+    'good', 'great', 'excellent', 'amazing', 'wonderful', 'fantastic', 
+    'love', 'happy', 'best', 'awesome', 'perfect', 'beautiful', 
+    'brilliant', 'outstanding', 'superb', 'delightful', 'pleased',
+    'recommend', 'impressed', 'exceeded', 'incredible', 'loving'
+  ];
+  
+  const negativeWords = [
+    'bad', 'terrible', 'awful', 'horrible', 'hate', 'sad', 'angry', 
+    'disappointed', 'worst', 'poor', 'broken', 'useless', 'waste',
+    'frustrating', 'annoying', 'disgusting', 'pathetic', 'regret',
+    'disappointing', 'mediocre', 'overpriced', 'avoid'
+  ];
   
   const words = text.toLowerCase().split(/\s+/);
   let score = 0;
+  let matches = { positive: [], negative: [] };
   
   words.forEach(word => {
-    if (positiveWords.includes(word)) score++;
-    if (negativeWords.includes(word)) score--;
+    // Remove punctuation for matching
+    const cleanWord = word.replace(/[^a-z]/g, '');
+    if (positiveWords.includes(cleanWord)) {
+      score++;
+      matches.positive.push(cleanWord);
+    }
+    if (negativeWords.includes(cleanWord)) {
+      score--;
+      matches.negative.push(cleanWord);
+    }
   });
   
   // Normalize score to -1 to 1 range
@@ -221,7 +244,8 @@ function analyzeLocalSentiment(text) {
   return {
     score: normalizedScore,
     sentiment: score > 0 ? 'positive' : score < 0 ? 'negative' : 'neutral',
-    source: 'local'
+    source: 'local',
+    matchedWords: matches
   };
 }
 

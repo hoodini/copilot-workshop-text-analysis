@@ -357,12 +357,11 @@ Include tests that expose the bugs in isPalindrome.
 
 ### Prompt 8.5 - Mock External API Calls ⭐ NEW
 ```
-Create integration tests for the /analyze/sentiment endpoint that mock the external API using nock.
+Create integration tests for the /translate endpoint that mock the external MyMemory API using nock.
 Test these scenarios:
 - When external API returns successful response
 - When external API times out
 - When external API returns an error
-- Verify the fallback to local analysis works
 ```
 
 > **Why this matters**: Real apps call external APIs (payment, auth, AI services). 
@@ -371,17 +370,20 @@ Test these scenarios:
 ### Prompt 8.6 - Test Translation with Mocked API ⭐ NEW
 ```
 Write integration tests for /translate endpoint that mock the MyMemory Translation API.
-Use nock to simulate API responses and failures.
+Use nock to simulate:
+- Successful translation response
+- API failures and error handling
+- Different language translations
 ```
 
-### Prompt 8.7 - Test External API Fallback Behavior ⭐ NEW
+### Prompt 8.7 - Improve Local Sentiment Analysis ⭐ NEW
 ```
-Create tests that verify the sentiment analysis correctly falls back to local analysis when:
-- The external API is unreachable
-- The API returns invalid data
-- The API times out
+The current sentiment analysis uses simple word matching. Improve it to:
+- Handle negation ("not good" should be negative)
+- Add intensity modifiers ("very good" should score higher)
+- Use word stemming so "loving" matches "love"
 
-Ensure the fallback response has source: 'local' to confirm fallback was used.
+Write tests to verify the improvements work.
 ```
 
 ---
