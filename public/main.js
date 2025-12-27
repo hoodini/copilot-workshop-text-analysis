@@ -116,7 +116,7 @@ if (transformOp) {
 // Hacker Effect
 const letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()_+";
 
-function runHackerEffect(element, finalText = null) {
+function runHackerEffect(element, finalText = null, speed = 1) {
   let iterations = 0;
   const originalText = finalText || element.dataset.value || element.innerText;
 
@@ -138,7 +138,9 @@ function runHackerEffect(element, finalText = null) {
       element.innerText = originalText; // Ensure clean final state
     }
 
-    iterations += 1 / 3;
+    // speed 1 = 1/3 letter per frame (slow)
+    // speed 5 = ~1.6 letters per frame (fast)
+    iterations += (1 / 3) * speed;
   }, 30);
 
   return interval; // Return detailed control if needed
@@ -184,7 +186,7 @@ async function analyzeStats(btn) {
 
   // Hacker Effect Start
   const originalText = btn.innerText;
-  runHackerEffect(btn);
+  runHackerEffect(btn, null, 1);
 
   const loadingText = "PROCESSING...";
   const interval = setInterval(() => {
@@ -202,7 +204,8 @@ async function analyzeStats(btn) {
 
   clearInterval(interval);
   btn.innerText = "DONE!";
-  runHackerEffect(btn, originalText); // Restore with effect
+  // Restore effectively instantly (speed 10) so it's done as result appears
+  runHackerEffect(btn, originalText, 10);
 
   if (result.success) {
     const d = result.data;
@@ -265,7 +268,7 @@ async function transformText(btn) {
   const result = await apiCall('/transform', 'POST', body);
 
   clearInterval(interval);
-  runHackerEffect(btn, originalText);
+  runHackerEffect(btn, originalText, 10); // Speed up restoration
 
   if (result.success) {
     showResult('transform-result', `
@@ -301,7 +304,7 @@ async function validateText(btn) {
   const result = await apiCall('/validate', 'POST', { text, type });
 
   clearInterval(interval);
-  runHackerEffect(btn, originalText);
+  runHackerEffect(btn, originalText, 10); // Speed up restoration
 
   if (result.success) {
     const isValid = result.data.isValid;
@@ -349,7 +352,7 @@ async function analyzeSentiment(btn) {
   const result = await apiCall('/analyze/sentiment', 'POST', { text });
 
   clearInterval(interval);
-  runHackerEffect(btn, originalText);
+  runHackerEffect(btn, originalText, 10); // Speed up restoration
 
   if (result.success) {
     const sentiment = result.data.sentiment;
@@ -394,7 +397,7 @@ async function analyzeFrequency(btn) {
   const result = await apiCall('/analyze/stats', 'POST', { text });
 
   clearInterval(interval);
-  runHackerEffect(btn, originalText);
+  runHackerEffect(btn, originalText, 10); // Speed up restoration
 
   if (result.success) {
     const word = result.data.mostFrequentWord;
@@ -433,7 +436,7 @@ async function checkHealth(btn) {
   const result = await apiCall('/health');
 
   clearInterval(interval);
-  runHackerEffect(btn, originalText);
+  runHackerEffect(btn, originalText, 10); // Speed up restoration
 
   if (result.success) {
     showResult('health-result', `
