@@ -1,0 +1,642 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>🔍 Text Analysis API - Interactive Demo</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+      background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+      min-height: 100vh;
+      color: #fff;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+
+    header {
+      text-align: center;
+      padding: 40px 20px;
+    }
+
+    header h1 {
+      font-size: 2.5rem;
+      margin-bottom: 10px;
+      background: linear-gradient(90deg, #00d2ff, #3a7bd5);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    header p {
+      color: #8892b0;
+      font-size: 1.1rem;
+    }
+
+    .tools-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+      gap: 20px;
+      margin-top: 30px;
+    }
+
+    .tool-card {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 16px;
+      padding: 24px;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    .tool-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+    }
+
+    .tool-card h2 {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 1.3rem;
+      margin-bottom: 8px;
+    }
+
+    .tool-card .emoji {
+      font-size: 1.5rem;
+    }
+
+    .tool-card .description {
+      color: #8892b0;
+      font-size: 0.9rem;
+      margin-bottom: 16px;
+    }
+
+    .tool-card textarea,
+    .tool-card input,
+    .tool-card select {
+      width: 100%;
+      padding: 12px;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 8px;
+      background: rgba(0, 0, 0, 0.3);
+      color: #fff;
+      font-size: 1rem;
+      margin-bottom: 12px;
+      font-family: inherit;
+    }
+
+    .tool-card textarea {
+      min-height: 100px;
+      resize: vertical;
+    }
+
+    .tool-card textarea:focus,
+    .tool-card input:focus,
+    .tool-card select:focus {
+      outline: none;
+      border-color: #3a7bd5;
+      box-shadow: 0 0 0 3px rgba(58, 123, 213, 0.2);
+    }
+
+    .tool-card button {
+      width: 100%;
+      padding: 12px 24px;
+      border: none;
+      border-radius: 8px;
+      background: linear-gradient(90deg, #00d2ff, #3a7bd5);
+      color: #fff;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: opacity 0.2s, transform 0.1s;
+    }
+
+    .tool-card button:hover {
+      opacity: 0.9;
+    }
+
+    .tool-card button:active {
+      transform: scale(0.98);
+    }
+
+    .tool-card button:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    .result {
+      margin-top: 16px;
+      padding: 16px;
+      background: rgba(0, 0, 0, 0.4);
+      border-radius: 8px;
+      display: none;
+    }
+
+    .result.show {
+      display: block;
+    }
+
+    .result.error {
+      border-left: 4px solid #ff6b6b;
+    }
+
+    .result.success {
+      border-left: 4px solid #51cf66;
+    }
+
+    .result-label {
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: #8892b0;
+      margin-bottom: 8px;
+    }
+
+    .result-content {
+      font-family: 'Monaco', 'Menlo', monospace;
+      font-size: 0.9rem;
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+    }
+
+    .stat-item {
+      text-align: center;
+      padding: 12px;
+      background: rgba(58, 123, 213, 0.2);
+      border-radius: 8px;
+    }
+
+    .stat-value {
+      font-size: 1.8rem;
+      font-weight: bold;
+      color: #00d2ff;
+    }
+
+    .stat-label {
+      font-size: 0.75rem;
+      color: #8892b0;
+      text-transform: uppercase;
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-size: 0.85rem;
+      font-weight: 600;
+    }
+
+    .badge.positive {
+      background: rgba(81, 207, 102, 0.2);
+      color: #51cf66;
+    }
+
+    .badge.negative {
+      background: rgba(255, 107, 107, 0.2);
+      color: #ff6b6b;
+    }
+
+    .badge.neutral {
+      background: rgba(255, 212, 59, 0.2);
+      color: #ffd43b;
+    }
+
+    .badge.valid {
+      background: rgba(81, 207, 102, 0.2);
+      color: #51cf66;
+    }
+
+    .badge.invalid {
+      background: rgba(255, 107, 107, 0.2);
+      color: #ff6b6b;
+    }
+
+    .inline-options {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+
+    .inline-options select {
+      margin-bottom: 0;
+    }
+
+    .api-badge {
+      font-size: 0.7rem;
+      padding: 2px 8px;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 4px;
+      font-family: monospace;
+    }
+
+    footer {
+      text-align: center;
+      padding: 40px 20px;
+      color: #8892b0;
+    }
+
+    footer a {
+      color: #00d2ff;
+      text-decoration: none;
+    }
+
+    footer a:hover {
+      text-decoration: underline;
+    }
+
+    .loading {
+      display: inline-block;
+      width: 16px;
+      height: 16px;
+      border: 2px solid rgba(255, 255, 255, 0.3);
+      border-radius: 50%;
+      border-top-color: #fff;
+      animation: spin 0.8s linear infinite;
+      margin-right: 8px;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    /* Bug Warning Banner */
+    .bug-banner {
+      background: linear-gradient(90deg, rgba(255, 107, 107, 0.2), rgba(255, 212, 59, 0.2));
+      border: 1px dashed rgba(255, 107, 107, 0.5);
+      border-radius: 12px;
+      padding: 16px 20px;
+      margin-bottom: 30px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .bug-banner .emoji {
+      font-size: 2rem;
+    }
+
+    .bug-banner p {
+      color: #ffd43b;
+      font-size: 0.95rem;
+    }
+
+    .bug-banner strong {
+      color: #ff6b6b;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>🔍 Text Analysis API</h1>
+      <p>Interactive demo - test the API visually</p>
+    </header>
+
+    <div class="bug-banner">
+      <span class="emoji">🐛</span>
+      <p>
+        <strong>Warning:</strong> This API has intentional bugs! 
+        Try "hello    world" (multiple spaces) in word count, or "Race Car" in palindrome check.
+        Can you find them all?
+      </p>
+    </div>
+
+    <div class="tools-grid">
+      <!-- Text Statistics -->
+      <div class="tool-card">
+        <h2><span class="emoji">📊</span> Text Statistics <span class="api-badge">POST /analyze/stats</span></h2>
+        <p class="description">Word count, sentence count, reading time - like Medium's "5 min read"</p>
+        <textarea id="stats-input" placeholder="Paste any text here... Try adding multiple spaces between words to find a bug!">GitHub Copilot is transforming how developers write code. It uses AI to suggest completions, write functions, and generate tests. Pretty amazing, right?</textarea>
+        <button onclick="analyzeStats()">Analyze Text</button>
+        <div id="stats-result" class="result"></div>
+      </div>
+
+      <!-- Transform Text -->
+      <div class="tool-card">
+        <h2><span class="emoji">🔄</span> Transform Text <span class="api-badge">POST /transform</span></h2>
+        <p class="description">Convert to URL slug, change case, reverse text</p>
+        <textarea id="transform-input" placeholder="Enter text to transform...">My Awesome Blog Post! (2024 Edition)</textarea>
+        <div class="inline-options">
+          <select id="transform-operation">
+            <option value="slug">To URL Slug</option>
+            <option value="case">Change Case</option>
+            <option value="reverse">Reverse Text</option>
+          </select>
+          <select id="transform-case" style="display: none;">
+            <option value="lower">lowercase</option>
+            <option value="upper">UPPERCASE</option>
+            <option value="title">Title Case</option>
+            <option value="camel">camelCase</option>
+          </select>
+        </div>
+        <button onclick="transformText()">Transform</button>
+        <div id="transform-result" class="result"></div>
+      </div>
+
+      <!-- Validate -->
+      <div class="tool-card">
+        <h2><span class="emoji">✅</span> Validate <span class="api-badge">POST /validate</span></h2>
+        <p class="description">Check emails, URLs, palindromes. Try "Race Car" - there's a bug!</p>
+        <input type="text" id="validate-input" placeholder="Enter text to validate..." value="racecar">
+        <select id="validate-type">
+          <option value="palindrome">Palindrome Check</option>
+          <option value="email">Email Validation</option>
+          <option value="url">URL Validation</option>
+          <option value="profanity">Profanity Check</option>
+        </select>
+        <button onclick="validateText()">Validate</button>
+        <div id="validate-result" class="result"></div>
+      </div>
+
+      <!-- Sentiment Analysis -->
+      <div class="tool-card">
+        <h2><span class="emoji">😊</span> Sentiment Analysis <span class="api-badge">POST /analyze/sentiment</span></h2>
+        <p class="description">Is this review positive or negative? Like Amazon review analysis</p>
+        <textarea id="sentiment-input" placeholder="Enter a review or comment...">This product is absolutely amazing! Best purchase I've ever made. The quality exceeded my expectations and shipping was super fast. Highly recommend to everyone!</textarea>
+        <button onclick="analyzeSentiment()">Analyze Sentiment</button>
+        <div id="sentiment-result" class="result"></div>
+      </div>
+
+      <!-- Word Frequency -->
+      <div class="tool-card">
+        <h2><span class="emoji">📈</span> Most Frequent Word <span class="api-badge">POST /analyze/stats</span></h2>
+        <p class="description">Find the most used word - useful for SEO keyword analysis</p>
+        <textarea id="frequency-input" placeholder="Enter text to find the most frequent word...">The quick brown fox jumps over the lazy dog. The dog was not amused. The fox laughed and the dog barked.</textarea>
+        <button onclick="analyzeFrequency()">Find Most Frequent</button>
+        <div id="frequency-result" class="result"></div>
+      </div>
+
+      <!-- Health Check -->
+      <div class="tool-card">
+        <h2><span class="emoji">💚</span> Health Check <span class="api-badge">GET /health</span></h2>
+        <p class="description">Check if the API is running - used by load balancers and Kubernetes</p>
+        <button onclick="checkHealth()">Check Health</button>
+        <div id="health-result" class="result"></div>
+      </div>
+    </div>
+
+    <footer>
+      <p>
+        🐛 Found a bug? That's the point! Use <a href="https://github.com/hoodini/copilot-workshop-text-analysis">GitHub Copilot</a> to fix it.
+        <br><br>
+        Made for <strong>GitHub Copilot 101 Workshop</strong>
+      </p>
+    </footer>
+  </div>
+
+  <script>
+    const API_BASE = '';
+
+    // Show/hide case options based on operation
+    document.getElementById('transform-operation').addEventListener('change', function() {
+      document.getElementById('transform-case').style.display = 
+        this.value === 'case' ? 'block' : 'none';
+    });
+
+    async function apiCall(endpoint, method = 'GET', body = null) {
+      try {
+        const options = {
+          method,
+          headers: { 'Content-Type': 'application/json' }
+        };
+        if (body) options.body = JSON.stringify(body);
+        
+        const response = await fetch(API_BASE + endpoint, options);
+        const data = await response.json();
+        
+        if (!response.ok) throw new Error(data.error || 'Request failed');
+        return { success: true, data };
+      } catch (error) {
+        return { success: false, error: error.message };
+      }
+    }
+
+    function showResult(elementId, content, isError = false) {
+      const el = document.getElementById(elementId);
+      el.className = `result show ${isError ? 'error' : 'success'}`;
+      el.innerHTML = content;
+    }
+
+    async function analyzeStats() {
+      const text = document.getElementById('stats-input').value;
+      const btn = event.target;
+      btn.innerHTML = '<span class="loading"></span>Analyzing...';
+      btn.disabled = true;
+
+      const result = await apiCall('/analyze/stats', 'POST', { text });
+      
+      if (result.success) {
+        const d = result.data;
+        showResult('stats-result', `
+          <div class="stats-grid">
+            <div class="stat-item">
+              <div class="stat-value">${d.wordCount}</div>
+              <div class="stat-label">Words</div>
+            </div>
+            <div class="stat-item">
+              <div class="stat-value">${d.sentenceCount}</div>
+              <div class="stat-label">Sentences</div>
+            </div>
+            <div class="stat-item">
+              <div class="stat-value">${d.readingTimeMinutes}</div>
+              <div class="stat-label">Min Read</div>
+            </div>
+            <div class="stat-item">
+              <div class="stat-value">${d.characterCount}</div>
+              <div class="stat-label">Characters</div>
+            </div>
+            <div class="stat-item">
+              <div class="stat-value">${d.characterCountNoSpaces}</div>
+              <div class="stat-label">No Spaces</div>
+            </div>
+            <div class="stat-item">
+              <div class="stat-value">${d.mostFrequentWord?.count || 0}</div>
+              <div class="stat-label">"${d.mostFrequentWord?.word || 'N/A'}"</div>
+            </div>
+          </div>
+        `);
+      } else {
+        showResult('stats-result', `<div class="result-content">❌ ${result.error}</div>`, true);
+      }
+
+      btn.innerHTML = 'Analyze Text';
+      btn.disabled = false;
+    }
+
+    async function transformText() {
+      const text = document.getElementById('transform-input').value;
+      const operation = document.getElementById('transform-operation').value;
+      const targetCase = document.getElementById('transform-case').value;
+      
+      const btn = event.target;
+      btn.innerHTML = '<span class="loading"></span>Transforming...';
+      btn.disabled = true;
+
+      const body = { text, operation };
+      if (operation === 'case') body.options = { targetCase };
+
+      const result = await apiCall('/transform', 'POST', body);
+      
+      if (result.success) {
+        showResult('transform-result', `
+          <div class="result-label">Original</div>
+          <div class="result-content" style="margin-bottom: 12px; opacity: 0.7;">${result.data.original}</div>
+          <div class="result-label">Result</div>
+          <div class="result-content" style="font-size: 1.1rem; color: #00d2ff;">${result.data.result}</div>
+        `);
+      } else {
+        showResult('transform-result', `<div class="result-content">❌ ${result.error}</div>`, true);
+      }
+
+      btn.innerHTML = 'Transform';
+      btn.disabled = false;
+    }
+
+    async function validateText() {
+      const text = document.getElementById('validate-input').value;
+      const type = document.getElementById('validate-type').value;
+      
+      const btn = event.target;
+      btn.innerHTML = '<span class="loading"></span>Validating...';
+      btn.disabled = true;
+
+      const result = await apiCall('/validate', 'POST', { text, type });
+      
+      if (result.success) {
+        const isValid = result.data.isValid;
+        const typeLabels = {
+          email: isValid ? 'Valid Email' : 'Invalid Email',
+          url: isValid ? 'Valid URL' : 'Invalid URL',
+          palindrome: isValid ? 'Is a Palindrome! ✨' : 'Not a Palindrome',
+          profanity: isValid ? 'Clean Text' : 'Contains Profanity'
+        };
+        
+        showResult('validate-result', `
+          <div style="text-align: center; padding: 20px;">
+            <span class="badge ${isValid ? 'valid' : 'invalid'}" style="font-size: 1.2rem; padding: 8px 20px;">
+              ${isValid ? '✅' : '❌'} ${typeLabels[type]}
+            </span>
+            ${!isValid && type === 'palindrome' ? '<p style="margin-top: 12px; color: #8892b0; font-size: 0.85rem;">🐛 Hint: Try "racecar" vs "Race Car" - see the bug?</p>' : ''}
+          </div>
+        `);
+      } else {
+        showResult('validate-result', `<div class="result-content">❌ ${result.error}</div>`, true);
+      }
+
+      btn.innerHTML = 'Validate';
+      btn.disabled = false;
+    }
+
+    async function analyzeSentiment() {
+      const text = document.getElementById('sentiment-input').value;
+      
+      const btn = event.target;
+      btn.innerHTML = '<span class="loading"></span>Analyzing...';
+      btn.disabled = true;
+
+      const result = await apiCall('/analyze/sentiment', 'POST', { text });
+      
+      if (result.success) {
+        const sentiment = result.data.sentiment;
+        const score = result.data.score;
+        const emoji = sentiment === 'positive' ? '😊' : sentiment === 'negative' ? '😞' : '😐';
+        
+        showResult('sentiment-result', `
+          <div style="text-align: center; padding: 20px;">
+            <div style="font-size: 3rem; margin-bottom: 10px;">${emoji}</div>
+            <span class="badge ${sentiment}" style="font-size: 1.2rem; padding: 8px 20px;">
+              ${sentiment.charAt(0).toUpperCase() + sentiment.slice(1)}
+            </span>
+            <div style="margin-top: 12px; color: #8892b0;">
+              Score: ${score > 0 ? '+' : ''}${score}
+            </div>
+          </div>
+        `);
+      } else {
+        showResult('sentiment-result', `<div class="result-content">❌ ${result.error}</div>`, true);
+      }
+
+      btn.innerHTML = 'Analyze Sentiment';
+      btn.disabled = false;
+    }
+
+    async function analyzeFrequency() {
+      const text = document.getElementById('frequency-input').value;
+      
+      const btn = event.target;
+      btn.innerHTML = '<span class="loading"></span>Analyzing...';
+      btn.disabled = true;
+
+      const result = await apiCall('/analyze/stats', 'POST', { text });
+      
+      if (result.success) {
+        const word = result.data.mostFrequentWord;
+        showResult('frequency-result', `
+          <div style="text-align: center; padding: 20px;">
+            <div style="font-size: 0.9rem; color: #8892b0; margin-bottom: 8px;">Most Frequent Word</div>
+            <div style="font-size: 2rem; color: #00d2ff; font-weight: bold;">"${word?.word || 'N/A'}"</div>
+            <div style="margin-top: 8px; color: #8892b0;">
+              appears <strong style="color: #fff;">${word?.count || 0}</strong> times
+            </div>
+          </div>
+        `);
+      } else {
+        showResult('frequency-result', `<div class="result-content">❌ ${result.error}</div>`, true);
+      }
+
+      btn.innerHTML = 'Find Most Frequent';
+      btn.disabled = false;
+    }
+
+    async function checkHealth() {
+      const btn = event.target;
+      btn.innerHTML = '<span class="loading"></span>Checking...';
+      btn.disabled = true;
+
+      const result = await apiCall('/health');
+      
+      if (result.success) {
+        showResult('health-result', `
+          <div style="text-align: center; padding: 20px;">
+            <div style="font-size: 3rem; margin-bottom: 10px;">💚</div>
+            <span class="badge valid" style="font-size: 1.1rem; padding: 8px 20px;">
+              API is Healthy
+            </span>
+            <div style="margin-top: 12px; color: #8892b0; font-family: monospace; font-size: 0.85rem;">
+              ${result.data.timestamp}
+            </div>
+          </div>
+        `);
+      } else {
+        showResult('health-result', `
+          <div style="text-align: center; padding: 20px;">
+            <div style="font-size: 3rem; margin-bottom: 10px;">❌</div>
+            <span class="badge invalid" style="font-size: 1.1rem; padding: 8px 20px;">
+              API is Down
+            </span>
+          </div>
+        `, true);
+      }
+
+      btn.innerHTML = 'Check Health';
+      btn.disabled = false;
+    }
+  </script>
+</body>
+</html>

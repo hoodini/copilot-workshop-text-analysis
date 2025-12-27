@@ -31,7 +31,13 @@ npm install
 npm start
 ```
 
-Now try these real examples:
+### 🖥️ Open the Visual UI
+
+Go to **http://localhost:3000** - you'll see an interactive dashboard to test all features!
+
+![UI Preview](https://via.placeholder.com/800x400/1a1a2e/00d2ff?text=Interactive+API+Dashboard)
+
+### Or use curl/Postman:
 
 ### 📖 "How long will this article take to read?"
 ```bash
