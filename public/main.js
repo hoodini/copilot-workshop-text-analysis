@@ -1,3 +1,90 @@
+// Neural Network Animation
+const canvas = document.getElementById('neural-canvas');
+if (canvas) {
+  const ctx = canvas.getContext('2d');
+  let width, height;
+  let particles = [];
+
+  function resize() {
+    width = canvas.width = window.innerWidth;
+    height = canvas.height = window.innerHeight;
+  }
+
+  class Particle {
+    constructor() {
+      this.x = Math.random() * width;
+      this.y = Math.random() * height;
+      this.vx = (Math.random() - 0.5) * 0.5;
+      this.vy = (Math.random() - 0.5) * 0.5;
+      this.size = Math.random() * 2 + 1;
+    }
+
+    update() {
+      this.x += this.vx;
+      this.y += this.vy;
+
+      if (this.x < 0) this.x = width;
+      if (this.x > width) this.x = 0;
+      if (this.y < 0) this.y = height;
+      if (this.y > height) this.y = 0;
+    }
+
+    draw() {
+      ctx.fillStyle = 'rgba(0, 242, 255, 0.3)';
+      ctx.beginPath();
+      ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+      ctx.fill();
+    }
+  }
+
+  function init() {
+    resize();
+    particles = [];
+    // Create particles based on screen size
+    const particleCount = Math.floor(width * height / 15000);
+    for (let i = 0; i < particleCount; i++) {
+      particles.push(new Particle());
+    }
+  }
+
+  function animate() {
+    ctx.clearRect(0, 0, width, height);
+
+    // Draw connections
+    ctx.strokeStyle = 'rgba(112, 0, 255, 0.05)';
+    ctx.lineWidth = 1;
+
+    for (let i = 0; i < particles.length; i++) {
+      particles[i].update();
+      particles[i].draw();
+
+      // Connect nearby particles
+      for (let j = i; j < particles.length; j++) {
+        const dx = particles[i].x - particles[j].x;
+        const dy = particles[i].y - particles[j].y;
+        const dist = Math.sqrt(dx * dx + dy * dy);
+
+        if (dist < 150) {
+          ctx.beginPath();
+          ctx.strokeStyle = `rgba(0, 242, 255, ${0.1 * (1 - dist / 150)})`;
+          ctx.moveTo(particles[i].x, particles[i].y);
+          ctx.lineTo(particles[j].x, particles[j].y);
+          ctx.stroke();
+        }
+      }
+    }
+    requestAnimationFrame(animate);
+  }
+
+  window.addEventListener('resize', () => {
+    resize();
+    init();
+  });
+
+  init();
+  animate();
+}
+
 const API_BASE = '';
 
 // Smooth Mouse tracking for cards
@@ -14,7 +101,7 @@ document.addEventListener('mousemove', e => {
 // Show/hide case options based on operation
 const transformOp = document.getElementById('transform-operation');
 if (transformOp) {
-  transformOp.addEventListener('change', function() {
+  transformOp.addEventListener('change', function () {
     const caseSelect = document.getElementById('transform-case');
     if (caseSelect) {
       caseSelect.style.display = this.value === 'case' ? 'block' : 'none';
@@ -33,13 +120,13 @@ async function apiCall(endpoint, method = 'GET', body = null) {
       headers: { 'Content-Type': 'application/json' }
     };
     if (body) options.body = JSON.stringify(body);
-    
+
     // Artificial delay for "network feel" and to show off animations
     await new Promise(r => setTimeout(r, 600));
-    
+
     const response = await fetch(API_BASE + endpoint, options);
     const data = await response.json();
-    
+
     if (!response.ok) throw new Error(data.error || 'Request failed');
     return { success: true, data };
   } catch (error) {
@@ -50,10 +137,10 @@ async function apiCall(endpoint, method = 'GET', body = null) {
 function showResult(elementId, content, isError = false) {
   const el = document.getElementById(elementId);
   if (!el) return;
-  
+
   el.className = `result show ${isError ? 'error' : 'success'}`;
   el.innerHTML = content;
-  
+
   // Re-trigger animation
   el.style.animation = 'none';
   el.offsetHeight; /* trigger reflow */
@@ -68,7 +155,7 @@ async function analyzeStats(btn) {
   btn.disabled = true;
 
   const result = await apiCall('/analyze/stats', 'POST', { text });
-  
+
   if (result.success) {
     const d = result.data;
     showResult('stats-result', `
@@ -112,7 +199,7 @@ async function transformText(btn) {
   const text = document.getElementById('transform-input').value;
   const operation = document.getElementById('transform-operation').value;
   const targetCase = document.getElementById('transform-case').value;
-  
+
   const originalText = btn.innerHTML;
   btn.innerHTML = '<span class="loading"></span>Transforming...';
   btn.disabled = true;
@@ -121,7 +208,7 @@ async function transformText(btn) {
   if (operation === 'case') body.options = { targetCase };
 
   const result = await apiCall('/transform', 'POST', body);
-  
+
   if (result.success) {
     showResult('transform-result', `
       <div style="margin-bottom: 8px; font-size: 0.8rem; color: var(--text-muted); text-transform: uppercase;">Original</div>
@@ -141,13 +228,13 @@ async function transformText(btn) {
 async function validateText(btn) {
   const text = document.getElementById('validate-input').value;
   const type = document.getElementById('validate-type').value;
-  
+
   const originalText = btn.innerHTML;
   btn.innerHTML = '<span class="loading"></span>Validating...';
   btn.disabled = true;
 
   const result = await apiCall('/validate', 'POST', { text, type });
-  
+
   if (result.success) {
     const isValid = result.data.isValid;
     const typeLabels = {
@@ -156,7 +243,7 @@ async function validateText(btn) {
       palindrome: isValid ? 'Is a Palindrome! ✨' : 'Not a Palindrome',
       profanity: isValid ? 'Clean Text' : 'Contains Profanity'
     };
-    
+
     const colorClass = isValid ? 'color: #00ff88;' : 'color: #ff0055;';
     const icon = isValid ? '✅' : '❌';
 
@@ -179,19 +266,19 @@ async function validateText(btn) {
 // Sentiment Analysis
 async function analyzeSentiment(btn) {
   const text = document.getElementById('sentiment-input').value;
-  
+
   const originalText = btn.innerHTML;
   btn.innerHTML = '<span class="loading"></span>Analyzing...';
   btn.disabled = true;
 
   const result = await apiCall('/analyze/sentiment', 'POST', { text });
-  
+
   if (result.success) {
     const sentiment = result.data.sentiment;
     const score = result.data.score;
     const emoji = sentiment === 'positive' ? '😊' : sentiment === 'negative' ? '😞' : '😐';
     const color = sentiment === 'positive' ? '#00ff88' : sentiment === 'negative' ? '#ff0055' : '#ffcc00';
-    
+
     showResult('sentiment-result', `
       <div style="text-align: center; padding: 10px;">
         <div style="font-size: 4rem; margin-bottom: 16px; filter: drop-shadow(0 0 20px ${color}); animation: fadeUp 0.5s;">${emoji}</div>
@@ -214,13 +301,13 @@ async function analyzeSentiment(btn) {
 // Frequency Analysis
 async function analyzeFrequency(btn) {
   const text = document.getElementById('frequency-input').value;
-  
+
   const originalText = btn.innerHTML;
   btn.innerHTML = '<span class="loading"></span>Scanning...';
   btn.disabled = true;
 
   const result = await apiCall('/analyze/stats', 'POST', { text });
-  
+
   if (result.success) {
     const word = result.data.mostFrequentWord;
     showResult('frequency-result', `
@@ -249,7 +336,7 @@ async function checkHealth(btn) {
   btn.disabled = true;
 
   const result = await apiCall('/health');
-  
+
   if (result.success) {
     showResult('health-result', `
       <div style="text-align: center; padding: 10px;">

@@ -4,7 +4,29 @@
 
 ---
 
-## 👨‍💻 Developed by **Yuval Avidani**
+## � START HERE → [WORKSHOP.md](WORKSHOP.md)
+
+**New to this repo?** Follow the step-by-step workshop guide:
+
+```bash
+# 1. Clone the repo
+git clone https://github.com/hoodini/copilot-workshop-text-analysis.git
+cd copilot-workshop-text-analysis
+
+# 2. Install dependencies
+npm install
+
+# 3. Start the server
+npm start
+
+# 4. Open the workshop guide and follow along!
+```
+
+📖 **[Open WORKSHOP.md](WORKSHOP.md)** for the complete hands-on guide with examples.
+
+---
+
+## �👨‍💻 Developed by **Yuval Avidani**
 
 > **AI Expert | GitHub Star ⭐ | Founder of YUV.AI**
 
@@ -50,7 +72,7 @@ Ever wondered how apps do these things?
 
 ---
 
-## 🎮 Try It Right Now
+## 🚀 Quick Start
 
 ```bash
 # Clone and run (takes 30 seconds)
@@ -59,6 +81,8 @@ cd copilot-workshop-text-analysis
 npm install
 npm start
 ```
+
+Then open http://localhost:3000 and **[follow WORKSHOP.md](WORKSHOP.md)** for exercises!
 
 ### 🖥️ Open the Visual UI
 
