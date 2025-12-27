@@ -112,16 +112,78 @@
     </div>
 
     <footer>
-      <p>
-        🐛 <strong>Debug this App:</strong> Use <a
-          href="https://github.com/hoodini/copilot-workshop-text-analysis">GitHub Copilot</a> to fix the intentional
-        bugs.
-        <br>
-        <span style="opacity: 0.5; font-size: 0.8rem; margin-top: 10px; display: block;">Designed for GitHub Copilot
-          Workshop</span>
-      </p>
+      <div class="footer-content">
+        <div class="developer-profile">
+          <h3>Developed by <a href="https://yuv.ai" target="_blank" class="dev-name">Yuval Avidani</a></h3>
+          <p class="role">AI Expert & GitHub Star ⭐</p>
+          <div class="social-links">
+            <a href="https://github.com/hoodini" target="_blank">@hoodini</a> •
+            <a href="https://yuv.ai" target="_blank">yuv.ai</a>
+          </div>
+        </div>
+
+        <p class="workshop-note">
+          🐛 <strong>Debug this App:</strong> Use <a
+            href="https://github.com/hoodini/copilot-workshop-text-analysis">GitHub Copilot</a> to fix the intentional
+          bugs.
+          <br>
+          <span style="opacity: 0.5; font-size: 0.8rem; margin-top: 10px; display: block;">Designed for GitHub Copilot
+            Workshop</span>
+        </p>
+      </div>
     </footer>
   </div>
+
+  <style>
+    /* Footer Enhancements */
+    .footer-content {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 20px;
+      padding-top: 20px;
+      border-top: 1px solid var(--glass-border);
+    }
+
+    .developer-profile {
+      text-align: center;
+      margin-bottom: 20px;
+      padding: 20px;
+      background: rgba(255, 255, 255, 0.03);
+      border-radius: 16px;
+      border: 1px solid var(--glass-border);
+    }
+
+    .dev-name {
+      font-size: 1.5rem;
+      font-weight: 800;
+      background: linear-gradient(90deg, #00f2ff, #7000ff);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      text-decoration: none;
+    }
+
+    .role {
+      color: var(--text-muted);
+      font-size: 0.9rem;
+      margin: 8px 0;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+    }
+
+    .social-links a {
+      color: #fff;
+      text-decoration: none;
+      margin: 0 10px;
+      font-weight: 600;
+      transition: color 0.3s;
+    }
+
+    .social-links a:hover {
+      color: var(--primary);
+    }
+  </style>
 
   <script src="main.js?v=2"></script>
 </body>

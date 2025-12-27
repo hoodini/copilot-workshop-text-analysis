@@ -4,6 +4,35 @@
 
 ---
 
+## 👨‍💻 Developed by **Yuval Avidani**
+
+> **AI Expert | GitHub Star ⭐ | Founder of YUV.AI**
+
+Connect with me:
+- 🌐 **Website:** [yuv.ai](https://yuv.ai)
+- 🐙 **GitHub:** [@hoodini](https://github.com/hoodini)
+- 💼 **LinkedIn:** [Yuval Avidani](https://www.linkedin.com/in/yuvalavidani)
+
+---
+
+## 📸 App Screenshots
+
+### Desktop Preview
+![Desktop Preview](public/assets/desktop-preview.png)
+
+### Mobile Glassmorphism
+<img src="public/assets/mobile-preview.png" width="375" alt="Mobile Preview">
+
+---
+
+## 🚀 Workshop Instructions
+1.  **Run the App**: `npm run dev`
+2.  **Open in Browser**: `http://localhost:3000`
+3.  **Find Bugs**: Use GitHub Copilot to identify and fix the intentional logic errors in `src/index.js`.
+ It's like a puzzle, but for developers.
+
+---
+
 ## 🤔 Wait, What Does This Actually Do?
 
 Ever wondered how apps do these things?
