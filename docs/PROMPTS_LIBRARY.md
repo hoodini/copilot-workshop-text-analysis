@@ -8,67 +8,53 @@
 
 ## 🧪 Exercise 1: Unit Testing
 
+> **💡 Teaching Tip**: These prompts are intentionally open-ended. Let Copilot suggest edge cases! 
+> This teaches participants that AI can help them think through test scenarios they might miss.
+
 ### Prompt 1.1 - Generate Basic Tests
 ```
-Generate unit tests for the countWords function in src/index.js. Include tests for:
-- Empty string
-- Null and undefined values
-- Single word
-- Multiple words
-- Words with numbers
+Generate comprehensive unit tests for the countWords function in src/index.js
 ```
 
-### Prompt 1.2 - Add Edge Cases
+> **What to observe**: Watch what edge cases Copilot suggests on its own!
+
+### Prompt 1.2 - Ask AI to Think About Edge Cases
 ```
-Add more test cases for countWords function to handle edge cases:
-- Multiple spaces between words
-- Leading and trailing spaces
-- Tab characters
-- Newline characters
-- Unicode characters (Hebrew, Chinese, Arabic)
-- Emojis
-- Only whitespace input
+What edge cases should I test for a word counting function?
 ```
+
+> **Learning moment**: This teaches participants to use AI as a thought partner, not just a code generator.
 
 ### Prompt 1.3 - Test isPalindrome
 ```
-Generate comprehensive unit tests for the isPalindrome function. 
-The tests should verify:
-- Simple palindromes like "racecar"
-- Case insensitivity ("RaceCar" should be true)
-- Ignoring spaces ("race car" should be true)
-- Ignoring punctuation ("A man, a plan, a canal: Panama")
-- Empty strings
-- Single characters
-- Non-palindromes
-
+Generate comprehensive unit tests for the isPalindrome function.
 Some tests should FAIL to reveal bugs in the current implementation.
 ```
 
+> **Discussion point**: After running tests, ask: "Which tests failed? What does this tell us about the bug?"
+
 ### Prompt 1.4 - Test findMostFrequentWord
 ```
-Create unit tests for findMostFrequentWord function with these scenarios:
-- Simple text with clear winner
-- Tie between two words
-- Single word repeated
-- Empty input
-- Text with punctuation (hello, hello. hello!)
-- Mixed case (Hello HELLO hello)
-- Text with numbers
+Create thorough unit tests for the findMostFrequentWord function.
+Think about edge cases and tricky inputs.
 ```
+
+> **Follow-up prompt** (if tests are too basic):
+> ```
+> What additional edge cases might break this function?
+> ```
 
 ### Prompt 1.5 - Generate Jest Config
 ```
-Create a jest.config.js file for this Node.js project with:
-- Test match pattern for .test.js files
-- Coverage collection enabled
-- Coverage thresholds (80% minimum)
-- Verbose output
+Create a jest.config.js file for this Node.js project with coverage enabled
 ```
 
 ---
 
 ## 🔄 Exercise 2: Refactoring to NestJS
+
+> **📖 What are DTOs?** Data Transfer Objects - classes that define the shape and validation rules 
+> for data sent to/from your API. Think of them as "contracts" for your request/response bodies.
 
 ### Prompt 2.1 - Plan Migration
 ```
@@ -481,9 +467,23 @@ Create a .gitlab-ci.yml file that:
 
 ### Better Prompts = Better Results
 
-❌ **Vague**: "Add tests"
+**Don't over-specify!** Let AI think for you:
 
-✅ **Specific**: "Generate unit tests for the countWords function with edge cases for empty strings, multiple spaces, unicode characters, and tab characters"
+❌ **Over-specified**: "Add tests for empty string, null, undefined, spaces..."
+
+✅ **Let AI think**: "Generate comprehensive tests with edge cases"
+
+✅ **Even better**: "What edge cases should I test for this function?"
+
+### The Power of Open-Ended Prompts
+
+| Instead of... | Try... |
+|---------------|--------|
+| "Test these 5 cases: ..." | "Generate thorough tests with edge cases" |
+| "Create a DTO with these fields: ..." | "Create DTOs for this endpoint with proper validation" |
+| "Handle these errors: ..." | "Add comprehensive error handling" |
+
+> **Why?** AI assistants often think of edge cases you'd miss!
 
 ### Iterate and Refine
 
