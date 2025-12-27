@@ -1,162 +1,107 @@
-# Text Analysis Service - LLM Guidance File
+# Text Analysis Service - Quick Reference for LLMs
 
-> This file helps AI assistants (GitHub Copilot, Claude, ChatGPT, etc.) understand and work with this project.
+> For detailed guidance, see llms.md
 
-## Project Overview
+## Project: GitHub Copilot 101 Workshop Demo
 
-This is a **Text Analysis Service** - a REST API built with Node.js/Express that provides text processing capabilities. It's designed as a teaching tool for GitHub Copilot workshops.
+REST API + Interactive Web UI for text analysis with INTENTIONAL BUGS for teaching.
 
 ## Quick Start
 
 ```bash
-# Install dependencies
+git clone https://github.com/hoodini/copilot-workshop-text-analysis.git
+cd copilot-workshop-text-analysis
 npm install
-
-# Run the application
-npm start
-
-# Run in development mode (hot reload)
-npm run dev
-
-# Run tests
-npm test
+npm start                    # Server at http://localhost:3000
+npm test                     # Expect 13 failing tests (bugs!)
+npm run test:integration     # Integration tests with API mocking
 ```
+
+## Stack
+
+- Node.js 18+ / Express.js
+- Jest + Supertest + Nock (testing)
+- MyMemory Translation API (free, no key)
+- Local sentiment analysis (word matching)
 
 ## Project Structure
 
 ```
-text-analysis-service/
-├── src/
-│   └── index.js          # Main application (Express.js)
-├── test/
-│   └── sample.test.js    # Sample unit tests
-├── docs/
-│   ├── COPILOT_101_WORKSHOP.md
-│   ├── PROMPTS_LIBRARY.md
-│   └── ...
-├── package.json
-├── README.md
-├── llms.txt              # This file
-└── AGENTS.md             # Guidelines for AI agents
+src/index.js           - Main API + all functions
+public/                - Interactive web UI (glassmorphism)
+test/sample.test.js    - Unit tests (13 intentional failures)
+test/integration/      - Integration tests with nock mocking
+WORKSHOP.md            - ⭐ Step-by-step guide (START HERE)
+docs/PROMPTS_LIBRARY.md - 40+ Copilot prompts
 ```
 
-## Key Endpoints
+## API Endpoints
 
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| GET | /health | Health check |
-| POST | /analyze/stats | Get word count, sentences, reading time |
-| POST | /transform | Slug, case conversion, reverse text |
-| POST | /validate | Email, URL, palindrome validation |
-| POST | /analyze/sentiment | Sentiment analysis |
-| POST | /translate | Text translation |
-
-## Technology Stack
-
-- **Runtime**: Node.js 18+
-- **Framework**: Express.js (legacy) → NestJS (target)
-- **Testing**: Jest + Supertest
-- **Language**: JavaScript (legacy) → TypeScript (target)
-
-## Common Tasks
-
-### Adding a New Endpoint
-1. Add the function to `src/index.js`
-2. Create the route handler
-3. Export the function for testing
-4. Add tests in `test/` directory
-
-### Running Tests
-```bash
-npm test                 # Run all tests
-npm run test:watch      # Watch mode
-npm run test:coverage   # With coverage report
+```
+GET  /health              - Health check
+POST /analyze/stats       - Word count, sentences, reading time
+POST /transform           - Slug, case (upper/lower/title/camel), reverse
+POST /validate            - Email, URL, palindrome, profanity
+POST /analyze/sentiment   - Local sentiment (positive/negative/neutral)
+POST /translate           - Translation via MyMemory API (free)
 ```
 
-### Building Docker Image
-```bash
-docker build -t text-analysis-service .
-docker run -p 3000:3000 text-analysis-service
-```
+## Intentional Bugs (DO NOT AUTO-FIX)
 
-## Known Issues (Intentional for Workshop)
+| Function | Bug |
+|----------|-----|
+| countWords() | split(' ') fails on multiple spaces |
+| countSentences() | Only splits on '.', ignores '?' and '!' |
+| isPalindrome() | Case-sensitive, includes spaces |
+| findMostFrequentWord() | O(n²) - needs hash map |
 
-These bugs exist for educational purposes:
+## Workshop Exercises (from WORKSHOP.md)
 
-1. **countWords()** - Doesn't handle multiple consecutive spaces
-2. **countSentences()** - Only splits on periods, ignores ? and !
-3. **isPalindrome()** - Case-sensitive, doesn't ignore spaces
-4. **findMostFrequentWord()** - O(n²) complexity, should be O(n)
+1. Fix countWords bug
+2. Fix isPalindrome bug
+3. Generate unit tests
+4. Improve sentiment analysis
+5. Optimize O(n²) algorithm
+6. Create Dockerfile
+7. Write integration tests with nock
+8. Add documentation
+9. Refactor to NestJS
 
-## Code Style
+## External APIs
 
-- Use ES6+ features
-- Prefer async/await over callbacks
-- Add JSDoc comments to all functions
-- Follow NestJS conventions when refactoring
+MyMemory Translation (FREE):
+- URL: https://api.mymemory.translated.net/get
+- No API key needed
+- 500 chars/request limit
 
-## Testing Guidelines
+Sentiment: Local word matching (22 pos + 22 neg words)
 
-- Each function should have unit tests
-- Include edge cases (null, undefined, empty, unicode)
-- Integration tests for API endpoints
-- Aim for 80%+ code coverage
-
-## When Helping with This Project
-
-### Do:
-- Generate comprehensive tests with edge cases
-- Suggest TypeScript types when refactoring
-- Recommend optimizations for O(n²) algorithms
-- Add proper error handling
-- Include JSDoc documentation
-
-### Don't:
-- Overwrite intentional bugs without explanation
-- Skip test cases for edge conditions
-- Use deprecated Node.js APIs
-- Add dependencies without justification
-
-## Environment Variables
-
-```env
-PORT=3000                    # Server port
-NODE_ENV=development         # Environment (development/production)
-LOG_LEVEL=info              # Logging level
-```
-
-## Useful Commands for AI Assistants
+## Testing
 
 ```bash
-# Check for issues
-npm run lint
-
-# Format code
-npm run format
-
-# Generate documentation
-npm run docs
-
-# Start in debug mode
-npm run debug
+npm test                    # All tests
+npm run test:integration    # Integration only
+npm run test:coverage       # With coverage
 ```
 
-## API Examples
+Integration tests use nock to mock external APIs.
 
-### Analyze Text Statistics
-```bash
-curl -X POST http://localhost:3000/analyze/stats \
-  -H "Content-Type: application/json" \
-  -d '{"text": "Hello world. This is a test."}'
-```
+## Guidelines
 
-### Transform Text
-```bash
-curl -X POST http://localhost:3000/transform \
-  -H "Content-Type: application/json" \
-  -d '{"text": "Hello World!", "operation": "slug"}'
-```
+DO:
+- Generate tests with edge cases
+- Explain what code does
+- Show before/after comparisons
+- Keep workshop FREE (no paid APIs)
 
-## Contact
+DON'T:
+- Auto-fix bugs without explaining
+- Add paid API dependencies
+- Skip input validation
 
-This is a workshop demo project. For issues, refer to the workshop facilitator.
+## Related Files
+
+- WORKSHOP.md - Step-by-step guide
+- README.md - Project overview
+- AGENTS.md - AI coding guidelines
+- docs/PROMPTS_LIBRARY.md - Workshop prompts
