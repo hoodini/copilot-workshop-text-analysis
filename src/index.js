@@ -162,52 +162,104 @@ function containsProfanity(text) {
 // EXTERNAL API INTEGRATION - Good for INTEGRATION TESTING
 // ============================================
 
-// Get sentiment analysis (mock external API call)
+// Configuration for external APIs (can be overridden in tests)
+const API_CONFIG = {
+  sentimentApi: process.env.SENTIMENT_API_URL || 'https://api.api-ninjas.com/v1/sentiment',
+  sentimentApiKey: process.env.SENTIMENT_API_KEY || 'demo-key',
+  translateApi: process.env.TRANSLATE_API_URL || 'https://api.mymemory.translated.net/get',
+  timeout: parseInt(process.env.API_TIMEOUT) || 5000
+};
+
+/**
+ * Analyze sentiment using external API
+ * Uses API-Ninjas sentiment API (free tier available)
+ * Falls back to local analysis if API fails
+ * 
+ * @param {string} text - Text to analyze
+ * @returns {Promise<{score: number, sentiment: string}>}
+ */
 async function analyzeSentiment(text) {
-  // In real scenario, this would call an external API
-  // For demo, we'll use a simple mock or real API
   try {
-    // This could be replaced with a real sentiment API
-    const response = await axios.post('https://api.example.com/sentiment', {
-      text: text
-    }, {
-      timeout: 5000
-    });
-    return response.data;
-  } catch (error) {
-    // Fallback to simple analysis
-    const positiveWords = ['good', 'great', 'excellent', 'amazing', 'wonderful', 'fantastic', 'love', 'happy'];
-    const negativeWords = ['bad', 'terrible', 'awful', 'horrible', 'hate', 'sad', 'angry', 'disappointed'];
-    
-    const words = text.toLowerCase().split(/\s+/);
-    let score = 0;
-    
-    words.forEach(word => {
-      if (positiveWords.includes(word)) score++;
-      if (negativeWords.includes(word)) score--;
+    // Call real sentiment API (API-Ninjas - free tier: 10k requests/month)
+    const response = await axios.get(API_CONFIG.sentimentApi, {
+      params: { text: text.substring(0, 2000) }, // API has text limit
+      headers: { 'X-Api-Key': API_CONFIG.sentimentApiKey },
+      timeout: API_CONFIG.timeout
     });
     
+    // API returns: { sentiment: "POSITIVE" | "NEGATIVE" | "NEUTRAL", score: 0.85 }
     return {
-      score: score,
-      sentiment: score > 0 ? 'positive' : score < 0 ? 'negative' : 'neutral'
+      score: response.data.score || 0,
+      sentiment: (response.data.sentiment || 'neutral').toLowerCase(),
+      source: 'api'
     };
+  } catch (error) {
+    // Fallback to local analysis when API unavailable
+    return analyzeLocalSentiment(text);
   }
 }
 
-// Translate text (mock external API)
+/**
+ * Local fallback sentiment analysis
+ * Used when external API is unavailable
+ */
+function analyzeLocalSentiment(text) {
+  const positiveWords = ['good', 'great', 'excellent', 'amazing', 'wonderful', 'fantastic', 'love', 'happy', 'best', 'awesome'];
+  const negativeWords = ['bad', 'terrible', 'awful', 'horrible', 'hate', 'sad', 'angry', 'disappointed', 'worst', 'poor'];
+  
+  const words = text.toLowerCase().split(/\s+/);
+  let score = 0;
+  
+  words.forEach(word => {
+    if (positiveWords.includes(word)) score++;
+    if (negativeWords.includes(word)) score--;
+  });
+  
+  // Normalize score to -1 to 1 range
+  const normalizedScore = Math.max(-1, Math.min(1, score / 5));
+  
+  return {
+    score: normalizedScore,
+    sentiment: score > 0 ? 'positive' : score < 0 ? 'negative' : 'neutral',
+    source: 'local'
+  };
+}
+
+/**
+ * Translate text using MyMemory API (free, no API key needed)
+ * 
+ * @param {string} text - Text to translate
+ * @param {string} targetLanguage - Target language code (e.g., 'es', 'fr', 'he')
+ * @returns {Promise<{translatedText: string, source: string, target: string}>}
+ */
 async function translateText(text, targetLanguage) {
   try {
-    const response = await axios.post('https://api.example.com/translate', {
-      text: text,
-      target: targetLanguage
-    }, {
-      timeout: 5000
+    // MyMemory Translation API - completely free, no API key required
+    const response = await axios.get(API_CONFIG.translateApi, {
+      params: {
+        q: text.substring(0, 500), // API has text limit
+        langpair: `en|${targetLanguage}`
+      },
+      timeout: API_CONFIG.timeout
     });
-    return response.data;
+    
+    if (response.data.responseStatus === 200) {
+      return {
+        translatedText: response.data.responseData.translatedText,
+        source: 'en',
+        target: targetLanguage,
+        match: response.data.responseData.match,
+        apiSource: 'mymemory'
+      };
+    }
+    
+    throw new Error('Translation failed');
   } catch (error) {
     return {
       error: 'Translation service unavailable',
-      original: text
+      message: error.message,
+      original: text,
+      targetLanguage
     };
   }
 }
@@ -320,10 +372,12 @@ app.post('/translate', async (req, res) => {
   res.json(translation);
 });
 
-// Start server
-app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
-});
+// Start server (only if not in test mode)
+if (process.env.NODE_ENV !== 'test') {
+  app.listen(PORT, () => {
+    console.log(`Server running on port ${PORT}`);
+  });
+}
 
 module.exports = {
   // Export functions for testing
@@ -340,6 +394,8 @@ module.exports = {
   isValidUrl,
   containsProfanity,
   analyzeSentiment,
+  analyzeLocalSentiment,
   translateText,
-  app
+  app,
+  API_CONFIG
 };

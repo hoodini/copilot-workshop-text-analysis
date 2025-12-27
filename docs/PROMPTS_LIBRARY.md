@@ -328,42 +328,60 @@ Add log rotation to the Winston logger with:
 
 ## 🔗 Exercise 8: Integration Tests
 
+> **🎯 Key Skill**: Testing your API endpoints AND mocking external service calls.
+> This is critical for real-world applications that depend on third-party APIs.
+
 ### Prompt 8.1 - Setup Integration Tests
 ```
-Create the test setup for integration tests using:
-- Jest as test runner
-- Supertest for HTTP assertions
-- Before/after hooks to start/stop server
-- Test database/mock setup if needed
+Create the test setup for integration tests using Jest and Supertest.
+Include before/after hooks to manage the server lifecycle.
 ```
 
-### Prompt 8.2 - Test Stats Endpoint
+### Prompt 8.2 - Test API Endpoints
 ```
-Write integration tests for POST /analyze/stats endpoint:
-- Successful request with valid text
-- Error when text is missing
-- Error when body is not JSON
-- Response time under 100ms
-- Correct content-type header
+Write integration tests for POST /analyze/stats endpoint using Supertest.
+Test both success and error scenarios.
 ```
 
 ### Prompt 8.3 - Test Transform Endpoint
 ```
-Write integration tests for POST /transform endpoint:
-- Each operation type (slug, case, reverse)
-- Invalid operation error
-- Missing required fields
-- Edge cases for each transformation
+Write integration tests for the POST /transform endpoint.
+Cover all operation types and error cases.
 ```
 
 ### Prompt 8.4 - Test Validation Endpoint
 ```
-Write integration tests for POST /validate endpoint testing:
-- Valid and invalid email addresses
-- Valid and invalid URLs
-- Palindrome detection
-- Profanity filtering
-- Error responses for invalid type
+Write integration tests for POST /validate endpoint.
+Include tests that expose the bugs in isPalindrome.
+```
+
+### Prompt 8.5 - Mock External API Calls ⭐ NEW
+```
+Create integration tests for the /analyze/sentiment endpoint that mock the external API using nock.
+Test these scenarios:
+- When external API returns successful response
+- When external API times out
+- When external API returns an error
+- Verify the fallback to local analysis works
+```
+
+> **Why this matters**: Real apps call external APIs (payment, auth, AI services). 
+> You need to test YOUR code without depending on external services being available.
+
+### Prompt 8.6 - Test Translation with Mocked API ⭐ NEW
+```
+Write integration tests for /translate endpoint that mock the MyMemory Translation API.
+Use nock to simulate API responses and failures.
+```
+
+### Prompt 8.7 - Test External API Fallback Behavior ⭐ NEW
+```
+Create tests that verify the sentiment analysis correctly falls back to local analysis when:
+- The external API is unreachable
+- The API returns invalid data
+- The API times out
+
+Ensure the fallback response has source: 'local' to confirm fallback was used.
 ```
 
 ---
