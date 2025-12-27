@@ -1,0 +1,79 @@
+# Sample GitLab CI Configuration for Workshop
+
+stages:
+  - test
+  - build
+  - docker
+
+variables:
+  NODE_VERSION: "20"
+
+# Cache node_modules between jobs
+cache:
+  key: ${CI_COMMIT_REF_SLUG}
+  paths:
+    - node_modules/
+
+# Test job
+test:
+  stage: test
+  image: node:${NODE_VERSION}-alpine
+  script:
+    - npm ci
+    - npm run lint --if-present
+    - npm test -- --coverage
+  coverage: '/All files[^|]*\|[^|]*\s+([\d\.]+)/'
+  artifacts:
+    when: always
+    reports:
+      junit: junit.xml
+      coverage_report:
+        coverage_format: cobertura
+        path: coverage/cobertura-coverage.xml
+    paths:
+      - coverage/
+
+# Build job
+build:
+  stage: build
+  image: node:${NODE_VERSION}-alpine
+  needs:
+    - test
+  script:
+    - npm ci
+    - npm run build --if-present
+  artifacts:
+    paths:
+      - dist/
+    expire_in: 1 hour
+
+# Docker build job
+docker:build:
+  stage: docker
+  image: docker:24.0.5
+  services:
+    - docker:24.0.5-dind
+  needs:
+    - test
+  only:
+    - main
+  variables:
+    DOCKER_TLS_CERTDIR: "/certs"
+  script:
+    - docker build -t $CI_REGISTRY_IMAGE:$CI_COMMIT_SHA .
+    - docker tag $CI_REGISTRY_IMAGE:$CI_COMMIT_SHA $CI_REGISTRY_IMAGE:latest
+    # Uncomment to push to registry:
+    # - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
+    # - docker push $CI_REGISTRY_IMAGE:$CI_COMMIT_SHA
+    # - docker push $CI_REGISTRY_IMAGE:latest
+
+# Optional: Deploy to staging
+# deploy:staging:
+#   stage: deploy
+#   only:
+#     - main
+#   script:
+#     - echo "Deploying to staging..."
+#   environment:
+#     name: staging
+#     url: https://staging.example.com

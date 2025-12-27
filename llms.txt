@@ -1,0 +1,162 @@
+# Text Analysis Service - LLM Guidance File
+
+> This file helps AI assistants (GitHub Copilot, Claude, ChatGPT, etc.) understand and work with this project.
+
+## Project Overview
+
+This is a **Text Analysis Service** - a REST API built with Node.js/Express that provides text processing capabilities. It's designed as a teaching tool for GitHub Copilot workshops.
+
+## Quick Start
+
+```bash
+# Install dependencies
+npm install
+
+# Run the application
+npm start
+
+# Run in development mode (hot reload)
+npm run dev
+
+# Run tests
+npm test
+```
+
+## Project Structure
+
+```
+text-analysis-service/
+├── src/
+│   └── index.js          # Main application (Express.js)
+├── test/
+│   └── sample.test.js    # Sample unit tests
+├── docs/
+│   ├── COPILOT_101_WORKSHOP.md
+│   ├── PROMPTS_LIBRARY.md
+│   └── ...
+├── package.json
+├── README.md
+├── llms.txt              # This file
+└── AGENTS.md             # Guidelines for AI agents
+```
+
+## Key Endpoints
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | /health | Health check |
+| POST | /analyze/stats | Get word count, sentences, reading time |
+| POST | /transform | Slug, case conversion, reverse text |
+| POST | /validate | Email, URL, palindrome validation |
+| POST | /analyze/sentiment | Sentiment analysis |
+| POST | /translate | Text translation |
+
+## Technology Stack
+
+- **Runtime**: Node.js 18+
+- **Framework**: Express.js (legacy) → NestJS (target)
+- **Testing**: Jest + Supertest
+- **Language**: JavaScript (legacy) → TypeScript (target)
+
+## Common Tasks
+
+### Adding a New Endpoint
+1. Add the function to `src/index.js`
+2. Create the route handler
+3. Export the function for testing
+4. Add tests in `test/` directory
+
+### Running Tests
+```bash
+npm test                 # Run all tests
+npm run test:watch      # Watch mode
+npm run test:coverage   # With coverage report
+```
+
+### Building Docker Image
+```bash
+docker build -t text-analysis-service .
+docker run -p 3000:3000 text-analysis-service
+```
+
+## Known Issues (Intentional for Workshop)
+
+These bugs exist for educational purposes:
+
+1. **countWords()** - Doesn't handle multiple consecutive spaces
+2. **countSentences()** - Only splits on periods, ignores ? and !
+3. **isPalindrome()** - Case-sensitive, doesn't ignore spaces
+4. **findMostFrequentWord()** - O(n²) complexity, should be O(n)
+
+## Code Style
+
+- Use ES6+ features
+- Prefer async/await over callbacks
+- Add JSDoc comments to all functions
+- Follow NestJS conventions when refactoring
+
+## Testing Guidelines
+
+- Each function should have unit tests
+- Include edge cases (null, undefined, empty, unicode)
+- Integration tests for API endpoints
+- Aim for 80%+ code coverage
+
+## When Helping with This Project
+
+### Do:
+- Generate comprehensive tests with edge cases
+- Suggest TypeScript types when refactoring
+- Recommend optimizations for O(n²) algorithms
+- Add proper error handling
+- Include JSDoc documentation
+
+### Don't:
+- Overwrite intentional bugs without explanation
+- Skip test cases for edge conditions
+- Use deprecated Node.js APIs
+- Add dependencies without justification
+
+## Environment Variables
+
+```env
+PORT=3000                    # Server port
+NODE_ENV=development         # Environment (development/production)
+LOG_LEVEL=info              # Logging level
+```
+
+## Useful Commands for AI Assistants
+
+```bash
+# Check for issues
+npm run lint
+
+# Format code
+npm run format
+
+# Generate documentation
+npm run docs
+
+# Start in debug mode
+npm run debug
+```
+
+## API Examples
+
+### Analyze Text Statistics
+```bash
+curl -X POST http://localhost:3000/analyze/stats \
+  -H "Content-Type: application/json" \
+  -d '{"text": "Hello world. This is a test."}'
+```
+
+### Transform Text
+```bash
+curl -X POST http://localhost:3000/transform \
+  -H "Content-Type: application/json" \
+  -d '{"text": "Hello World!", "operation": "slug"}'
+```
+
+## Contact
+
+This is a workshop demo project. For issues, refer to the workshop facilitator.
