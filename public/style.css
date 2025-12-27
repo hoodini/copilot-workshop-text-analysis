@@ -85,9 +85,11 @@ header {
   font-weight: 600;
   font-size: 1rem;
   letter-spacing: 0.5px;
+  color: #fff;
+  text-decoration: none;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
   animation: fadeUp 0.8s ease forwards;
-  transition: transform 0.3s;
+  transition: transform 0.3s, border-color 0.3s;
 }
 
 .copilot-badge:hover {

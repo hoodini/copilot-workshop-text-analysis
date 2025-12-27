@@ -113,6 +113,37 @@ if (transformOp) {
   });
 }
 
+// Hacker Effect
+const letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()_+";
+
+function runHackerEffect(element, finalText = null) {
+  let iterations = 0;
+  const originalText = finalText || element.dataset.value || element.innerText;
+
+  if (!element.dataset.value) element.dataset.value = originalText;
+
+  const interval = setInterval(() => {
+    element.innerText = originalText
+      .split("")
+      .map((letter, index) => {
+        if (index < iterations) {
+          return originalText[index];
+        }
+        return letters[Math.floor(Math.random() * letters.length)];
+      })
+      .join("");
+
+    if (iterations >= originalText.length) {
+      clearInterval(interval);
+      element.innerText = originalText; // Ensure clean final state
+    }
+
+    iterations += 1 / 3;
+  }, 30);
+
+  return interval; // Return detailed control if needed
+}
+
 async function apiCall(endpoint, method = 'GET', body = null) {
   try {
     const options = {
@@ -150,11 +181,28 @@ function showResult(elementId, content, isError = false) {
 // Stats Analysis
 async function analyzeStats(btn) {
   const text = document.getElementById('stats-input').value;
-  const originalText = btn.innerHTML;
-  btn.innerHTML = '<span class="loading"></span>Analyzing...';
+
+  // Hacker Effect Start
+  const originalText = btn.innerText;
+  runHackerEffect(btn);
+
+  const loadingText = "PROCESSING...";
+  const interval = setInterval(() => {
+    btn.innerText = loadingText
+      .split("")
+      .map((letter, index) => {
+        return letters[Math.floor(Math.random() * letters.length)];
+      })
+      .join("");
+  }, 50);
+
   btn.disabled = true;
 
   const result = await apiCall('/analyze/stats', 'POST', { text });
+
+  clearInterval(interval);
+  btn.innerText = "DONE!";
+  runHackerEffect(btn, originalText); // Restore with effect
 
   if (result.success) {
     const d = result.data;
@@ -190,7 +238,6 @@ async function analyzeStats(btn) {
     showResult('stats-result', `<strong>Error:</strong> ${result.error}`, true);
   }
 
-  btn.innerHTML = originalText;
   btn.disabled = false;
 }
 
@@ -200,14 +247,25 @@ async function transformText(btn) {
   const operation = document.getElementById('transform-operation').value;
   const targetCase = document.getElementById('transform-case').value;
 
-  const originalText = btn.innerHTML;
-  btn.innerHTML = '<span class="loading"></span>Transforming...';
+  const originalText = btn.innerText;
+
+  // Hacker loader
+  const interval = setInterval(() => {
+    btn.innerText = "TRANSFORMING..."
+      .split("")
+      .map((letter, index) => letters[Math.floor(Math.random() * letters.length)])
+      .join("");
+  }, 50);
+
   btn.disabled = true;
 
   const body = { text, operation };
   if (operation === 'case') body.options = { targetCase };
 
   const result = await apiCall('/transform', 'POST', body);
+
+  clearInterval(interval);
+  runHackerEffect(btn, originalText);
 
   if (result.success) {
     showResult('transform-result', `
@@ -220,7 +278,6 @@ async function transformText(btn) {
     showResult('transform-result', `<strong>Error:</strong> ${result.error}`, true);
   }
 
-  btn.innerHTML = originalText;
   btn.disabled = false;
 }
 
@@ -229,11 +286,22 @@ async function validateText(btn) {
   const text = document.getElementById('validate-input').value;
   const type = document.getElementById('validate-type').value;
 
-  const originalText = btn.innerHTML;
-  btn.innerHTML = '<span class="loading"></span>Validating...';
+  const originalText = btn.innerText;
+
+  // Hacker loader
+  const interval = setInterval(() => {
+    btn.innerText = "VALIDATING..."
+      .split("")
+      .map((letter, index) => letters[Math.floor(Math.random() * letters.length)])
+      .join("");
+  }, 50);
+
   btn.disabled = true;
 
   const result = await apiCall('/validate', 'POST', { text, type });
+
+  clearInterval(interval);
+  runHackerEffect(btn, originalText);
 
   if (result.success) {
     const isValid = result.data.isValid;
@@ -259,7 +327,6 @@ async function validateText(btn) {
     showResult('validate-result', `<strong>Error:</strong> ${result.error}`, true);
   }
 
-  btn.innerHTML = originalText;
   btn.disabled = false;
 }
 
@@ -267,11 +334,22 @@ async function validateText(btn) {
 async function analyzeSentiment(btn) {
   const text = document.getElementById('sentiment-input').value;
 
-  const originalText = btn.innerHTML;
-  btn.innerHTML = '<span class="loading"></span>Analyzing...';
+  const originalText = btn.innerText;
+
+  // Hacker loader
+  const interval = setInterval(() => {
+    btn.innerText = "DETECTING..."
+      .split("")
+      .map((letter, index) => letters[Math.floor(Math.random() * letters.length)])
+      .join("");
+  }, 50);
+
   btn.disabled = true;
 
   const result = await apiCall('/analyze/sentiment', 'POST', { text });
+
+  clearInterval(interval);
+  runHackerEffect(btn, originalText);
 
   if (result.success) {
     const sentiment = result.data.sentiment;
@@ -294,7 +372,6 @@ async function analyzeSentiment(btn) {
     showResult('sentiment-result', `<strong>Error:</strong> ${result.error}`, true);
   }
 
-  btn.innerHTML = originalText;
   btn.disabled = false;
 }
 
@@ -302,11 +379,22 @@ async function analyzeSentiment(btn) {
 async function analyzeFrequency(btn) {
   const text = document.getElementById('frequency-input').value;
 
-  const originalText = btn.innerHTML;
-  btn.innerHTML = '<span class="loading"></span>Scanning...';
+  const originalText = btn.innerText;
+
+  // Hacker loader
+  const interval = setInterval(() => {
+    btn.innerText = "CALCULATING..."
+      .split("")
+      .map((letter, index) => letters[Math.floor(Math.random() * letters.length)])
+      .join("");
+  }, 50);
+
   btn.disabled = true;
 
   const result = await apiCall('/analyze/stats', 'POST', { text });
+
+  clearInterval(interval);
+  runHackerEffect(btn, originalText);
 
   if (result.success) {
     const word = result.data.mostFrequentWord;
@@ -325,17 +413,27 @@ async function analyzeFrequency(btn) {
     showResult('frequency-result', `<strong>Error:</strong> ${result.error}`, true);
   }
 
-  btn.innerHTML = originalText;
   btn.disabled = false;
 }
 
 // Health Check
 async function checkHealth(btn) {
-  const originalText = btn.innerHTML;
-  btn.innerHTML = '<span class="loading"></span>Checking...';
+  const originalText = btn.innerText;
+
+  // Hacker loader
+  const interval = setInterval(() => {
+    btn.innerText = "PINGING..."
+      .split("")
+      .map((letter, index) => letters[Math.floor(Math.random() * letters.length)])
+      .join("");
+  }, 50);
+
   btn.disabled = true;
 
   const result = await apiCall('/health');
+
+  clearInterval(interval);
+  runHackerEffect(btn, originalText);
 
   if (result.success) {
     showResult('health-result', `
@@ -356,6 +454,5 @@ async function checkHealth(btn) {
     `, true);
   }
 
-  btn.innerHTML = originalText;
   btn.disabled = false;
 }
