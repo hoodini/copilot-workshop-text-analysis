@@ -16,35 +16,32 @@
 <!-- Created by AI Agent -->
 ```mermaid
 flowchart TD
-  A[מפתח מריץ: npm test] --> B[Jest מתחיל ריצה]
-  B --> C[טעינת test/setup.js]
-  C --> C1[set NODE_ENV=test]
-  C --> C2[set API_TIMEOUT=2000]
+  A["Developer runs: npm test"] --> B["Jest starts"]
+  B --> C["Load test/setup.js"]
+  C --> C1["NODE_ENV = test"]
+  C --> C2["API_TIMEOUT = 2000"]
 
-  B --> D{איסוף קבצי בדיקה לפי jest.config.js (testMatch)}
-  D --> U[test/unit/app-core.test.js - Unit פונקציות טהורות]
-  D --> S[test/sample.test.js - Sample בדיקות מודגמות ו-skip]
-  D --> I[test/integration/api.integration.test.js - Integration API + Nock]
+  B --> D["Collect test files via jest.config.js"]
+  D --> U["test/unit/app-core.test.js"]
+  D --> S["test/sample.test.js"]
+  D --> I["test/integration/api.integration.test.js"]
 
-  %% Unit tests
-  U --> U1[countWords/countSentences/countCharacters/calculateReadingTime]
-  U --> U2[toSlug/convertCase/reverseText]
-  U --> U3[isValidEmail/isValidUrl/containsProfanity]
-  U --> U4[analyzeLocalSentiment + analyzeSentiment]
+  U --> U1["Stats: countWords, countSentences, etc."]
+  U --> U2["Transform: toSlug, convertCase, reverseText"]
+  U --> U3["Validation: isValidEmail, isValidUrl, containsProfanity"]
+  U --> U4["Sentiment: analyzeLocalSentiment, analyzeSentiment"]
 
-  %% Sample tests
-  S --> S1[בדיקות שמדגימות באגים ידועים]
-  S1 --> S2[skip כדי לשמור על CI ירוק]
+  S --> S1["Demo tests for known bugs"]
+  S1 --> S2["Skipped to keep CI green"]
 
-  %% Integration tests
-  I --> I1[Supertest שולח בקשות ל-app (מ-src/index.js)]
-  I1 --> I2[Nock מדמה MyMemory API עבור translate]
-  I1 --> I3[בדיקת endpoints: health, analyze stats, analyze sentiment, translate]
+  I --> I1["Supertest sends requests to app"]
+  I1 --> I2["Nock mocks MyMemory API"]
+  I1 --> I3["Endpoints: health, stats, sentiment, translate"]
 
-  U --> R[תוצאות]
+  U --> R["Results"]
   S --> R
   I --> R
-  R --> Z[סיכום Jest: passed / skipped / todo]
+  R --> Z["Jest summary: passed, skipped, todo"]
 ```
 
 ## אילו בדיקות בוצעו (מה כיסינו)
