@@ -12,6 +12,41 @@
 - סביבת בדיקות: Node
 - הגדרות בדיקה: `process.env.NODE_ENV` מוגדר ל־`test` דרך `test/setup.js`, ולכן השרת לא עולה בזמן בדיקות.
 
+## תרשים זרימה (Mermaid) – מה רץ כשמריצים `npm test`
+<!-- Created by AI Agent -->
+```mermaid
+flowchart TD
+  A[מפתח מריץ: npm test] --> B[Jest מתחיל ריצה]
+  B --> C[טעינת test/setup.js]
+  C --> C1[set NODE_ENV=test]
+  C --> C2[set API_TIMEOUT=2000]
+
+  B --> D{איסוף קבצי בדיקה לפי jest.config.js\n(testMatch)}
+  D --> U[test/unit/app-core.test.js\nUnit: פונקציות טהורות]
+  D --> S[test/sample.test.js\nSample: חלק מהבדיקות מסומנות skip]
+  D --> I[test/integration/api.integration.test.js\nIntegration: API + Nock]
+
+  %% Unit tests
+  U --> U1[countWords/countSentences/countCharacters/calculateReadingTime]
+  U --> U2[toSlug/convertCase/reverseText]
+  U --> U3[isValidEmail/isValidUrl/containsProfanity]
+  U --> U4[analyzeLocalSentiment + analyzeSentiment]
+
+  %% Sample tests
+  S --> S1[בדיקות שמדגימות באגים ידועים]
+  S1 --> S2[skip כדי לשמור על CI ירוק]
+
+  %% Integration tests
+  I --> I1[Supertest שולח בקשות ל-app\n(require('../../src/index').app)]
+  I1 --> I2[Nock מדמה MyMemory API ל-/translate]
+  I1 --> I3[בדיקת endpoints: /health, /analyze/stats, /analyze/sentiment, /translate]
+
+  U --> R[תוצאות]
+  S --> R
+  I --> R
+  R --> Z[סיכום Jest: passed / skipped / todo]
+```
+
 ## אילו בדיקות בוצעו (מה כיסינו)
 
 ### 1) בדיקות יחידה – פונקציות “טהורות” (ללא HTTP)
