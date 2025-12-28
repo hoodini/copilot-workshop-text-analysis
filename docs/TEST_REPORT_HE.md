@@ -21,10 +21,10 @@ flowchart TD
   C --> C1[set NODE_ENV=test]
   C --> C2[set API_TIMEOUT=2000]
 
-  B --> D{איסוף קבצי בדיקה לפי jest.config.js<br/>(testMatch)}
-  D --> U[test/unit/app-core.test.js<br/>Unit: פונקציות טהורות]
-  D --> S[test/sample.test.js<br/>Sample: חלק מהבדיקות מסומנות skip]
-  D --> I[test/integration/api.integration.test.js<br/>Integration: API + Nock]
+  B --> D{איסוף קבצי בדיקה לפי jest.config.js (testMatch)}
+  D --> U[test/unit/app-core.test.js - Unit פונקציות טהורות]
+  D --> S[test/sample.test.js - Sample בדיקות מודגמות ו-skip]
+  D --> I[test/integration/api.integration.test.js - Integration API + Nock]
 
   %% Unit tests
   U --> U1[countWords/countSentences/countCharacters/calculateReadingTime]
@@ -37,9 +37,9 @@ flowchart TD
   S1 --> S2[skip כדי לשמור על CI ירוק]
 
   %% Integration tests
-  I --> I1[Supertest שולח בקשות ל-app<br/>המיובא מ-src/index.js]
-  I1 --> I2[Nock מדמה MyMemory API ל-/translate]
-  I1 --> I3[בדיקת endpoints: /health, /analyze/stats, /analyze/sentiment, /translate]
+  I --> I1[Supertest שולח בקשות ל-app (מ-src/index.js)]
+  I1 --> I2[Nock מדמה MyMemory API עבור translate]
+  I1 --> I3[בדיקת endpoints: health, analyze stats, analyze sentiment, translate]
 
   U --> R[תוצאות]
   S --> R
