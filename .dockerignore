@@ -1,0 +1,25 @@
+# Created by AI Agent
+node_modules
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+.git
+.gitignore
+.vscode
+
+coverage
+
+# Tests and workshop docs not needed in the runtime image context
+test
+jest.config.js
+AGENTS.md
+WORKSHOP.md
+WORKSHOP_GUIDE.md
+llms.md
+llms.txt
+docs
+
+# OS/filesystem noise
+.DS_Store
+Thumbs.db

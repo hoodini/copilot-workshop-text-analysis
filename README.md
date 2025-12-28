@@ -82,6 +82,19 @@ npm install
 npm start
 ```
 
+## 🐳 Docker
+
+```bash
+# Created by AI Agent
+# Build the image
+docker build -t text-analysis-service:local .
+
+# Run the container
+docker run --rm -p 3000:3000 text-analysis-service:local
+```
+
+Then open http://localhost:3000
+
 Then open http://localhost:3000 and **[follow WORKSHOP.md](WORKSHOP.md)** for exercises!
 
 ### 🖥️ Open the Visual UI
